@@ -2,10 +2,44 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Smartphone, Monitor, Palette, ArrowRight, Check, Users, Download, Globe, Star } from 'lucide-react';
 
-const TechProductShowcase = () => {
-  const containerRef = useRef(null);
-  const [scrollY, setScrollY] = useState(0);
-  const [isVisible, setIsVisible] = useState({});
+// Interface definitions
+interface ProductStat {
+  label: string;
+  value: string;
+  icon: React.ReactNode;
+}
+
+interface ProductStep {
+  title: string;
+  description: string;
+  icon: string;
+}
+
+interface Product {
+  id: number;
+  name: string;
+  category: string;
+  description: string;
+  deviceType: 'mobile' | 'desktop' | 'tablet';
+  imagePlaceholder: string;
+  features: string[];
+  stats: ProductStat[];
+  steps: ProductStep[];
+}
+
+interface DeviceProps {
+  imageSrc: string;
+  isVisible: boolean;
+}
+
+interface VisibilityState {
+  [key: number]: boolean;
+}
+
+const TechProductShowcase: React.FC = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [scrollY, setScrollY] = useState<number>(0);
+  const [isVisible, setIsVisible] = useState<VisibilityState>({});
 
   useEffect(() => {
     const handleScroll = () => {
@@ -16,7 +50,7 @@ const TechProductShowcase = () => {
         
         // Track visibility for each section
         const sections = containerRef.current.querySelectorAll('[data-section]');
-        const newVisibility = {};
+        const newVisibility: VisibilityState = {};
         
         sections.forEach((section, index) => {
           const sectionRect = section.getBoundingClientRect();
@@ -32,14 +66,14 @@ const TechProductShowcase = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const products = [
+  const products: Product[] = [
     {
       id: 1,
       name: "Zapp",
       category: "Mobile Application",
       description: "Next-generation mobile experience with lightning-fast performance and intuitive user interface designed for modern users.",
       deviceType: "mobile",
-      imagePlaceholder: "/images/zapp-screen.jpg", // You'll replace this
+      imagePlaceholder: "/images/zapp-screen.jpg",
       features: [
         "Cross-platform compatibility",
         "Real-time synchronization",
@@ -63,7 +97,7 @@ const TechProductShowcase = () => {
       category: "Web Platform",
       description: "Revolutionary collaboration platform that transforms how teams work together, featuring advanced project management and real-time communication tools.",
       deviceType: "desktop",
-      imagePlaceholder: "/images/collabd-screen.jpg", // You'll replace this
+      imagePlaceholder: "/images/collabd-screen.jpg",
       features: [
         "Team collaboration tools",
         "Project management suite",
@@ -87,7 +121,7 @@ const TechProductShowcase = () => {
       category: "Design Services",
       description: "Comprehensive design solutions that merge aesthetics with functionality, creating exceptional user experiences across all digital platforms.",
       deviceType: "tablet",
-      imagePlaceholder: "/images/design-screen.jpg", // You'll replace this
+      imagePlaceholder: "/images/design-screen.jpg",
       features: [
         "User research & testing",
         "Wireframing & prototyping",
@@ -107,7 +141,7 @@ const TechProductShowcase = () => {
     }
   ];
 
-  const MobileDevice = ({ imageSrc, isVisible }) => (
+  const MobileDevice: React.FC<DeviceProps> = ({ imageSrc, isVisible }) => (
     <div className={`relative transition-all duration-1000 ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
       {/* iPhone Frame */}
       <div className="relative w-[280px] h-[560px] bg-[#333446] rounded-[2.5rem] p-[8px] shadow-2xl">
@@ -121,7 +155,8 @@ const TechProductShowcase = () => {
             alt="App Screen"
             className="w-full h-full object-cover"
             onError={(e) => {
-              e.target.src = '/images/moockup.jpg';
+              const target = e.target as HTMLImageElement;
+              target.src = '/images/moockup.jpg';
             }}
           />
         </div>
@@ -135,7 +170,7 @@ const TechProductShowcase = () => {
     </div>
   );
 
-  const DesktopDevice = ({ imageSrc, isVisible }) => (
+  const DesktopDevice: React.FC<DeviceProps> = ({ imageSrc, isVisible }) => (
     <div className={`relative transition-all duration-1000 ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
       {/* Monitor */}
       <div className="relative">
@@ -147,7 +182,8 @@ const TechProductShowcase = () => {
               alt="Website Screen"
               className="w-full h-full object-cover"
               onError={(e) => {
-                e.target.src = '/images/laptop.png';
+                const target = e.target as HTMLImageElement;
+                target.src = '/images/laptop.png';
               }}
             />
           </div>
@@ -164,7 +200,7 @@ const TechProductShowcase = () => {
     </div>
   );
 
-  const TabletDevice = ({ imageSrc, isVisible }) => (
+  const TabletDevice: React.FC<DeviceProps> = ({ imageSrc, isVisible }) => (
     <div className={`relative transition-all duration-1000 ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
       {/* iPad Frame */}
       <div className="relative w-[320px] h-[420px] bg-[#333446] rounded-[1.5rem] p-[12px] shadow-2xl">
@@ -175,7 +211,8 @@ const TechProductShowcase = () => {
             alt="Design Screen"
             className="w-full h-full object-cover"
             onError={(e) => {
-              e.target.src = '/images/Screenshot.png';
+              const target = e.target as HTMLImageElement;
+              target.src = '/images/Screenshot.png';
             }}
           />
         </div>
@@ -304,7 +341,7 @@ const TechProductShowcase = () => {
                     {product.steps.map((step, idx) => (
                       <div 
                         key={idx} 
-                        className="flex items-start space-x-4"
+                        className="flex items-start space-x-4 relative"
                         style={{
                           opacity: isVisible[index + 1] ? 1 : 0,
                           transform: `translateY(${isVisible[index + 1] ? 0 : 20}px)`,
@@ -403,8 +440,10 @@ const TechProductShowcase = () => {
             <p className="text-xl text-gray-300 mb-8 leading-relaxed font-medium">
               Join thousands of satisfied customers who trust our innovative solutions
             </p>
-            <button className="px-10 py-5 bg-gradient-to-r from-[#006BB4] to-[#333446] text-white font-black rounded-xl hover:scale-105 transform transition-all duration-300 shadow-2xl hover:shadow-[#006BB4]/25 tracking-wide"
-            onClick={() => window.location.href = './Contact'}>
+            <button 
+              className="px-10 py-5 bg-gradient-to-r from-[#006BB4] to-[#333446] text-white font-black rounded-xl hover:scale-105 transform transition-all duration-300 shadow-2xl hover:shadow-[#006BB4]/25 tracking-wide"
+              onClick={() => window.location.href = './Contact'}
+            >
               Start Your Journey
             </button>
           </div>

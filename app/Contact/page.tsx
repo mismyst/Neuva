@@ -18,8 +18,13 @@ import {
   ChevronRight
 } from 'lucide-react';
 
-// Step Component
-const Step = ({ children, className = "" }) => {
+// Step Component with proper TypeScript types
+interface StepProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
+const Step: React.FC<StepProps> = ({ children, className = "" }) => {
   return (
     <div className={`w-full ${className}`}>
       {children}
@@ -27,8 +32,21 @@ const Step = ({ children, className = "" }) => {
   );
 };
 
-// Stepper Component
-const Stepper = ({
+// Stepper Component with proper TypeScript types
+interface StepperProps {
+  children: React.ReactNode;
+  initialStep?: number;
+  onStepChange?: (step: number) => void;
+  onFinalStepCompleted?: () => void;
+  backButtonText?: string;
+  nextButtonText?: string;
+  finalButtonText?: string;
+  showStepNumbers?: boolean;
+  className?: string;
+  canProceed?: (stepIndex: number) => boolean;
+}
+
+const Stepper: React.FC<StepperProps> = ({
   children,
   initialStep = 1,
   onStepChange,
@@ -41,12 +59,12 @@ const Stepper = ({
   canProceed = () => true
 }) => {
   const [currentStep, setCurrentStep] = useState(initialStep - 1);
-  const [completedSteps, setCompletedSteps] = useState(new Set());
+  const [completedSteps, setCompletedSteps] = useState(new Set<number>());
   
   const steps = React.Children.toArray(children);
   const totalSteps = steps.length;
 
-  const goToStep = (stepIndex) => {
+  const goToStep = (stepIndex: number) => {
     if (stepIndex >= 0 && stepIndex < totalSteps) {
       setCurrentStep(stepIndex);
       if (onStepChange) {
@@ -75,9 +93,9 @@ const Stepper = ({
     }
   };
 
-  const isStepCompleted = (stepIndex) => completedSteps.has(stepIndex);
-  const isCurrentStep = (stepIndex) => stepIndex === currentStep;
-  const isStepAccessible = (stepIndex) => stepIndex <= currentStep || isStepCompleted(stepIndex);
+  const isStepCompleted = (stepIndex: number) => completedSteps.has(stepIndex);
+  const isCurrentStep = (stepIndex: number) => stepIndex === currentStep;
+  const isStepAccessible = (stepIndex: number) => stepIndex <= currentStep || isStepCompleted(stepIndex);
 
   const stepTitles = ['Project Type', 'Contact Details', 'Requirements', 'Meeting', 'Review'];
 
@@ -203,9 +221,28 @@ const Stepper = ({
   );
 };
 
+// Form data interface
+interface FormData {
+  projectType: string;
+  name: string;
+  email: string;
+  phone: string;
+  description: string;
+  meetingDate: string;
+  meetingTime: string;
+}
+
+// Project type interface
+interface ProjectType {
+  id: string;
+  title: string;
+  description: string;
+  icon: React.ComponentType<{ className?: string }>;
+}
+
 // Main Contact Form Component
-const ContactQuestionnaire = () => {
-  const [formData, setFormData] = useState({
+const ContactQuestionnaire: React.FC = () => {
+  const [formData, setFormData] = useState<FormData>({
     projectType: '',
     name: '',
     email: '',
@@ -216,10 +253,10 @@ const ContactQuestionnaire = () => {
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState(null);
+  const [submitStatus, setSubmitStatus] = useState<'success' | 'error' | null>(null);
   const [submitError, setSubmitError] = useState('');
 
-  const projectTypes = [
+  const projectTypes: ProjectType[] = [
     {
       id: 'ui-ux',
       title: 'UI/UX Design',
@@ -246,7 +283,7 @@ const ContactQuestionnaire = () => {
     }
   ];
 
-  const handleInputChange = (field, value) => {
+  const handleInputChange = (field: keyof FormData, value: string) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -265,12 +302,12 @@ const ContactQuestionnaire = () => {
     }, 2000);
   };
 
-  const canProceed = (stepIndex) => {
+  const canProceed = (stepIndex: number): boolean => {
     switch (stepIndex) {
       case 0: return formData.projectType !== '';
-      case 1: return formData.name && formData.email && formData.phone;
+      case 1: return formData.name !== '' && formData.email !== '' && formData.phone !== '';
       case 2: return formData.description.trim() !== '';
-      case 3: return formData.meetingDate && formData.meetingTime;
+      case 3: return formData.meetingDate !== '' && formData.meetingTime !== '';
       default: return true;
     }
   };

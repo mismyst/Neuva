@@ -50,7 +50,9 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
 );
 Card.displayName = "Card";
 
-type CardRef = RefObject<HTMLDivElement>;
+// Fixed: Updated CardRef type to allow null
+type CardRef = RefObject<HTMLDivElement | null>;
+
 interface Slot {
   x: number;
   y: number;
@@ -115,7 +117,7 @@ const CardSwap: React.FC<CardSwapProps> = ({
   );
   const refs = useMemo<CardRef[]>(() => childArr.map(() => React.createRef<HTMLDivElement>()), [childArr.length]);
   const order = useRef<number[]>(Array.from({ length: childArr.length }, (_, i) => i));
-  const intervalRef = useRef<number>();
+  const intervalRef = useRef<number | undefined>(undefined);
   const container = useRef<HTMLDivElement>(null);
   const isPaused = useRef<boolean>(false);
 
